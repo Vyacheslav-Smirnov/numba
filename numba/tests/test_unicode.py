@@ -373,11 +373,11 @@ class TestUnicode(BaseTest):
                 for i , j in product(range(-10,10), (-10,10)):
                     self.assertEqual(pyfunc(s, sub, i, j),
                                      cfunc(s, sub, i, j),
-                                     "'%s' in '%s'?" % (sub, s))
+                                     "'%s' in '%s': start:%s, end:%s?" % (sub, s, i, j))
                 for j in range(-10, 10):
                     self.assertEqual(pyfunc(s, sub, None, j),
                                      cfunc(s, sub, None, j),
-                                     "'%s' in '%s'?" % (sub, s))
+                                     "'%s' in '%s' : start:%s, end:%s?" % (sub, s, 0, j))
 
     def test_count_with_start_only(self):
         pyfunc = count_with_start_only_usecase
@@ -391,19 +391,19 @@ class TestUnicode(BaseTest):
                 for i in range(-10, 10):
                     self.assertEqual(pyfunc(s, sub, i),
                                      cfunc(s, sub, i),
-                                     "'%s' in '%s'?" % (sub, s))
+                                     "'%s' in '%s : start:%s, end:%s'?" % (sub, s, i, len(s)))
                 self.assertEqual(pyfunc(s, sub, None),
                                  cfunc(s, sub, None),
-                                 "'%s' in '%s'?" % (sub, s))
+                                 "'%s' in '%s : start:%s, end:%s'?" % (sub, s, 0, len(s)))
 
     def test_count_arg_type_check(self):
         cfunc = njit(count_with_start_end_usecase)
         with self.assertRaises(TypingError) as raises:
             cfunc('ascii', 'c', 1, 0.5)
-        self.assertIn('slice index must be of type None or Integer or Optional', str(raises.exception))
+        self.assertIn('The slice index must be an Integer, None, or Optional', str(raises.exception))
         with self.assertRaises(TypingError) as raises:
             cfunc('abcde', 's', 1.2, 7)
-        self.assertIn('slice index must be of type None or Integer or Optional', str(raises.exception))
+        self.assertIn('The slice index must be an Integer, None, or Optional', str(raises.exception))
 
     def test_getitem(self):
         pyfunc = getitem_usecase
